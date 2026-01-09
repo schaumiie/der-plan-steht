@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Countdown</title>
+  <style>
+    :root{
+      --bg: #000000;
+      --neon: #b70000; /* Stranger-Things-Rot */
+      --glow-1: 0 0 6px rgba(183, 0, 0, 0.7);
+      --glow-2: 0 0 18px rgba(183, 0, 0, 0.6);
+      --glow-3: 0 0 42px rgba(183, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0; 
+      background: var(--bg);
+      color: var(--neon);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .panel {
+      width: min(900px, 92vw);
+      text-align: center;
+    }
+
+    .headline {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 18px 0;
+      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
+      line-height: 1.25;
+      font-size: clamp(14px, 2.2vw, 20px);
+    }
+
+    .line {
+      height: 2px;
+      width: 100%;
+      background: var(--neon);
+      box-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
+      opacity: 0.95;
+      margin: 14px 0;
+    }
+
+    .timer {
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(34px, 6vw, 72px);
+      margin: 0;
+    }
+
+    .sub {
+      margin: 14px 0 0 0;
+      opacity: 0.9;
+      text-shadow: var(--glow-1), var(--glow-2);
+      letter-spacing: 0.06em;
+      font-size: clamp(12px, 1.8vw, 16px);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel" aria-live="polite">
+      <div class="headline">DER PLAN STEHT. SEI BEREIT!</div>
+      <div class="line"></div>
+
+      <p id="timer" class="timer">--:--:--:--</p>
+
+      <div class="line"></div>
+      <div class="sub" id="targetLabel">Ziel: 10.07.2026, 14:00</div>
+    </div>
+  </div>
+
+  <script>
+    // Zielzeit: 10.07.2026, 14:00 (lokale Zeit des Browsers)
+    const target = new Date(2026, 6, 10, 14, 0, 0); // Monat ist 0-basiert: 6 = Juli
+
+    const timerEl = document.getElementById("timer");
+    const targetLabelEl = document.getElementById("targetLabel");
+
+    function pad2(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function formatCountdown(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      // Anzeige: DDD Tage  HH:MM:SS
+      return `${days} TAG${days === 1 ? "" : "E"}  ${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+    }
+
+    function tick() {
+      const now = new Date();
+      const diff = target.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        timerEl.textContent = "0 TAGE  00:00:00";
+        targetLabelEl.textContent = "JETZT.";
+        return;
+      }
+
+      timerEl.textContent = formatCountdown(diff);
+    }
+
+    tick();
+    setInterval(tick, 250); // läuft flüssig, aber ohne unnötig viel CPU
+  </script>
+</body>
+</html>
