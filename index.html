@@ -4,23 +4,30 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Countdown</title>
+
+  <!-- Coole, passende Schrift (nicht Stranger Things): "Teko" wirkt plakativ/retro, gut für Neon -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg: #000000;
-      --neon: #b70000; /* Stranger-Things-Rot */
-      --glow-1: 0 0 6px rgba(183, 0, 0, 0.7);
-      --glow-2: 0 0 18px rgba(183, 0, 0, 0.6);
+      --neon: #b70000; /* Neon-Rot */
+      --glow-1: 0 0 6px rgba(183, 0, 0, 0.70);
+      --glow-2: 0 0 18px rgba(183, 0, 0, 0.60);
       --glow-3: 0 0 42px rgba(183, 0, 0, 0.45);
+      --glow-4: 0 0 90px rgba(255, 40, 40, 0.25);
     }
 
     * { box-sizing: border-box; }
 
     html, body {
       height: 100%;
-      margin: 0; 
+      margin: 0;
       background: var(--bg);
       color: var(--neon);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      font-family: "Teko", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .wrap {
@@ -28,104 +35,180 @@
       display: grid;
       place-items: center;
       padding: 24px;
+      overflow: hidden;
     }
 
     .panel {
-      width: min(900px, 92vw);
+      width: min(980px, 92vw);
       text-align: center;
+      position: relative;
+    }
+
+    /* Sehr subtiler roter Dunst im Hintergrund */
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -120px;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(183,0,0,0.18), transparent 55%),
+        radial-gradient(circle at 20% 70%, rgba(255,40,40,0.10), transparent 60%),
+        radial-gradient(circle at 80% 75%, rgba(183,0,0,0.10), transparent 60%);
+      filter: blur(10px);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
     }
 
     .headline {
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
       margin: 0 0 18px 0;
-      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
-      line-height: 1.25;
-      font-size: clamp(14px, 2.2vw, 20px);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: clamp(18px, 2.8vw, 30px);
+      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3), var(--glow-4);
     }
 
     .line {
       height: 2px;
       width: 100%;
       background: var(--neon);
-      box-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
-      opacity: 0.95;
-      margin: 14px 0;
+      box-shadow: var(--glow-1), var(--glow-2), var(--glow-3), var(--glow-4);
+      margin: 18px 0;
+      transform-origin: center;
     }
 
     .timer {
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
+      font-weight: 700;
+      letter-spacing: 0.12em;
       font-variant-numeric: tabular-nums;
-      font-size: clamp(34px, 6vw, 72px);
+      font-size: clamp(44px, 7vw, 98px);
       margin: 0;
+      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3), var(--glow-4);
     }
 
     .sub {
       margin: 14px 0 0 0;
-      opacity: 0.9;
-      text-shadow: var(--glow-1), var(--glow-2);
-      letter-spacing: 0.06em;
-      font-size: clamp(12px, 1.8vw, 16px);
+      font-size: clamp(14px, 2.2vw, 18px);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
+      opacity: 0.9;
+      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
+    }
+
+    /* Neon-Flackern: Kombination aus Glow + ganz leichter Helligkeitsvariation */
+    .flicker-soft {
+      animation: flickerSoft 4.5s infinite;
+    }
+    .flicker-hard {
+      animation: flickerHard 6.5s infinite;
+    }
+    .flicker-line {
+      animation: lineFlicker 5.2s infinite;
+    }
+
+    @keyframes flickerSoft {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      2% { opacity: 0.9; filter: brightness(1.05); }
+      3% { opacity: 1; }
+      8% { opacity: 0.95; filter: brightness(0.98); }
+      9% { opacity: 1; }
+      52% { opacity: 1; }
+      53% { opacity: 0.88; filter: brightness(1.12); }
+      54% { opacity: 1; }
+      76% { opacity: 0.96; }
+      77% { opacity: 1; }
+    }
+
+    @keyframes flickerHard {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      12% { opacity: 0.85; filter: brightness(1.15); }
+      12.5% { opacity: 1; }
+      13% { opacity: 0.75; filter: brightness(0.9); }
+      13.4% { opacity: 1; }
+      33% { opacity: 1; }
+      33.2% { opacity: 0.7; filter: brightness(1.2); }
+      33.6% { opacity: 1; }
+      64% { opacity: 1; }
+      64.2% { opacity: 0.82; filter: brightness(0.95); }
+      64.6% { opacity: 1; }
+      88% { opacity: 0.92; filter: brightness(1.08); }
+      88.3% { opacity: 1; }
+    }
+
+    @keyframes lineFlicker {
+      0%, 100% { opacity: 0.95; transform: scaleX(1); filter: brightness(1); }
+      18% { opacity: 0.75; transform: scaleX(0.995); filter: brightness(1.25); }
+      18.6% { opacity: 0.95; transform: scaleX(1); }
+      41% { opacity: 0.9; }
+      41.3% { opacity: 0.65; filter: brightness(1.35); }
+      41.8% { opacity: 0.95; filter: brightness(1); }
+      73% { opacity: 0.9; }
+      73.2% { opacity: 0.78; filter: brightness(1.2); }
+      73.7% { opacity: 0.95; filter: brightness(1); }
+    }
+
+    /* Optional: respektiert "Reduce Motion" */
+    @media (prefers-reduced-motion: reduce) {
+      .flicker-soft, .flicker-hard, .flicker-line { animation: none !important; }
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="panel" aria-live="polite">
-      <div class="headline">DER PLAN STEHT. SEI BEREIT!</div>
-      <div class="line"></div>
-        <div class="line"></div>
+      <div class="content">
+        <div class="headline flicker-soft">DER PLAN STEHT. SEI BEREIT!</div>
 
-      <p id="timer" class="timer">--:--:--:--</p>
+        <div class="line flicker-line"></div>
+        <div class="line flicker-line"></div>
 
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="sub" id="targetLabel">10.07.2026, 14:00 – 12.07.2026</div>
+        <div id="timer" class="timer flicker-hard">-- TAGE --:--:--</div>
+
+        <div class="line flicker-line"></div>
+        <div class="line flicker-line"></div>
+
+        <div class="sub flicker-soft" id="targetLabel">10.07.2026 · 14:00 – 12.07.2025</div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Zielzeit: 10.07.2026, 14:00 (lokale Zeit des Browsers)
-    const target = new Date(2026, 6, 10, 14, 0, 0); // Monat ist 0-basiert: 6 = Juli
-
+    // Ziel: 10.07.2026, 14:00 (lokale Zeit des Browsers)
+    const targetDate = new Date(2026, 6, 10, 14, 0, 0); // Monat 0-basiert (6 = Juli)
     const timerEl = document.getElementById("timer");
-    const targetLabelEl = document.getElementById("targetLabel");
+    const labelEl = document.getElementById("targetLabel");
 
-    function pad2(n) {
+    function pad(n) {
       return String(n).padStart(2, "0");
     }
 
-    function formatCountdown(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
+    function updateTimer() {
+      const now = new Date();
+      let diff = targetDate - now;
 
+      if (diff <= 0) {
+        timerEl.textContent = "0 TAGE 00:00:00";
+        labelEl.textContent = "JETZT.";
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
       const days = Math.floor(totalSeconds / 86400);
       const hours = Math.floor((totalSeconds % 86400) / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
 
-      // Anzeige: DDD Tage  HH:MM:SS
-      return `${days} TAG${days === 1 ? "" : "E"}  ${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+      timerEl.textContent = `${days} TAGE ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
 
-    function tick() {
-      const now = new Date();
-      const diff = target.getTime() - now.getTime();
-
-      if (diff <= 0) {
-        timerEl.textContent = "0 TAGE  00:00:00";
-        targetLabelEl.textContent = "JETZT.";
-        return;
-      }
-
-      timerEl.textContent = formatCountdown(diff);
-    }
-
-    tick();
-    setInterval(tick, 250); // läuft flüssig, aber ohne unnötig viel CPU
+    updateTimer();
+    setInterval(updateTimer, 250);
   </script>
 </body>
 </html>
