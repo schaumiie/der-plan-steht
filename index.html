@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Countdown</title>
 
-  <!-- Coole, passende Schrift (nicht Stranger Things): "Teko" wirkt plakativ/retro, gut für Neon -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
@@ -13,7 +12,8 @@
   <style>
     :root{
       --bg: #000000;
-      --neon: #b70000; /* Neon-Rot */
+      --neon: #b70000;
+
       --glow-1: 0 0 6px rgba(183, 0, 0, 0.70);
       --glow-2: 0 0 18px rgba(183, 0, 0, 0.60);
       --glow-3: 0 0 42px rgba(183, 0, 0, 0.45);
@@ -44,7 +44,6 @@
       position: relative;
     }
 
-    /* Sehr subtiler roter Dunst im Hintergrund */
     .panel::before {
       content: "";
       position: absolute;
@@ -59,10 +58,7 @@
       z-index: 0;
     }
 
-    .content {
-      position: relative;
-      z-index: 1;
-    }
+    .content { position: relative; z-index: 1; }
 
     .headline {
       margin: 0 0 18px 0;
@@ -70,25 +66,47 @@
       letter-spacing: 0.18em;
       text-transform: uppercase;
       font-size: clamp(18px, 2.8vw, 30px);
-      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3), var(--glow-4);
     }
 
     .line {
       height: 2px;
       width: 100%;
       background: var(--neon);
-      box-shadow: var(--glow-1), var(--glow-2), var(--glow-3), var(--glow-4);
       margin: 18px 0;
       transform-origin: center;
     }
 
-    .timer {
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      font-variant-numeric: tabular-nums;
-      font-size: clamp(44px, 7vw, 98px);
-      margin: 0;
+    /* Grundzustand Neon (ohne Flackern) */
+    .neon {
       text-shadow: var(--glow-1), var(--glow-2), var(--glow-3), var(--glow-4);
+      filter: brightness(1);
+      opacity: 1;
+      transition: filter 70ms linear, opacity 70ms linear, text-shadow 70ms linear, transform 70ms linear;
+    }
+
+    /* Timer: immer zweizeilig, stabil auf Mobile */
+    .timer {
+      margin: 0;
+      letter-spacing: 0.10em;
+      font-weight: 700;
+    }
+
+    .timer .days {
+      display: block;
+      white-space: nowrap;
+      font-size: clamp(28px, 4.5vw, 52px);
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+
+    .timer .hms {
+      display: block;
+      white-space: nowrap;
+      font-size: clamp(44px, 7vw, 98px);
+      line-height: 1.0;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1, "lnum" 1;
     }
 
     .sub {
@@ -97,64 +115,38 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       opacity: 0.9;
-      text-shadow: var(--glow-1), var(--glow-2), var(--glow-3);
     }
 
-    /* Neon-Flackern: Kombination aus Glow + ganz leichter Helligkeitsvariation */
-    .flicker-soft {
-      animation: flickerSoft 4.5s infinite;
-    }
-    .flicker-hard {
-      animation: flickerHard 6.5s infinite;
-    }
-    .flicker-line {
-      animation: lineFlicker 5.2s infinite;
+    /* Realistischere Flicker-States (werden per JS unregelmäßig gesetzt) */
+    .flicker-dim {
+      opacity: 0.82;
+      filter: brightness(0.9);
+      text-shadow: 0 0 3px rgba(183,0,0,0.45), 0 0 10px rgba(183,0,0,0.35), 0 0 22px rgba(183,0,0,0.22);
     }
 
-    @keyframes flickerSoft {
-      0%, 100% { opacity: 1; filter: brightness(1); }
-      2% { opacity: 0.9; filter: brightness(1.05); }
-      3% { opacity: 1; }
-      8% { opacity: 0.95; filter: brightness(0.98); }
-      9% { opacity: 1; }
-      52% { opacity: 1; }
-      53% { opacity: 0.88; filter: brightness(1.12); }
-      54% { opacity: 1; }
-      76% { opacity: 0.96; }
-      77% { opacity: 1; }
+    .flicker-pop {
+      opacity: 1;
+      filter: brightness(1.25);
+      text-shadow:
+        0 0 8px rgba(255,40,40,0.85),
+        0 0 22px rgba(255,40,40,0.65),
+        0 0 54px rgba(255,40,40,0.50),
+        0 0 120px rgba(255,40,40,0.28);
     }
 
-    @keyframes flickerHard {
-      0%, 100% { opacity: 1; filter: brightness(1); }
-      12% { opacity: 0.85; filter: brightness(1.15); }
-      12.5% { opacity: 1; }
-      13% { opacity: 0.75; filter: brightness(0.9); }
-      13.4% { opacity: 1; }
-      33% { opacity: 1; }
-      33.2% { opacity: 0.7; filter: brightness(1.2); }
-      33.6% { opacity: 1; }
-      64% { opacity: 1; }
-      64.2% { opacity: 0.82; filter: brightness(0.95); }
-      64.6% { opacity: 1; }
-      88% { opacity: 0.92; filter: brightness(1.08); }
-      88.3% { opacity: 1; }
+    .flicker-off {
+      opacity: 0.12;
+      filter: brightness(0.6);
+      text-shadow: none;
     }
 
-    @keyframes lineFlicker {
-      0%, 100% { opacity: 0.95; transform: scaleX(1); filter: brightness(1); }
-      18% { opacity: 0.75; transform: scaleX(0.995); filter: brightness(1.25); }
-      18.6% { opacity: 0.95; transform: scaleX(1); }
-      41% { opacity: 0.9; }
-      41.3% { opacity: 0.65; filter: brightness(1.35); }
-      41.8% { opacity: 0.95; filter: brightness(1); }
-      73% { opacity: 0.9; }
-      73.2% { opacity: 0.78; filter: brightness(1.2); }
-      73.7% { opacity: 0.95; filter: brightness(1); }
+    /* optional: ein ganz leichter "Stromimpuls" */
+    .flicker-jitter {
+      transform: translateY(0.6px);
     }
 
-    /* Optional: respektiert "Reduce Motion" */
     @media (prefers-reduced-motion: reduce) {
-      .flicker-soft, .flicker-hard, .flicker-line { animation: none !important; }
+      .neon { transition: none !important; }
     }
   </style>
 </head>
@@ -163,38 +155,42 @@
   <div class="wrap">
     <div class="panel" aria-live="polite">
       <div class="content">
-        <div class="headline flicker-soft">DER PLAN STEHT. SEI BEREIT!</div>
+        <div id="headline" class="headline neon">DER PLAN STEHT. SEI BEREIT!</div>
 
-        <div class="line flicker-line"></div>
-        <div class="line flicker-line"></div>
+        <div id="lineTop" class="line neon"></div>
+        <div id="lineTop" class="line neon"></div>
 
-        <div id="timer" class="timer flicker-hard">-- TAGE --:--:--</div>
+        <div id="timer" class="timer neon">
+          <span id="days" class="days">-- TAGE</span>
+          <span id="hms" class="hms">--:--:--</span>
+        </div>
 
-        <div class="line flicker-line"></div>
-        <div class="line flicker-line"></div>
+        <div id="lineBottom" class="line neon"></div>
+        <div id="lineBottom" class="line neon"></div>
 
-        <div class="sub flicker-soft" id="targetLabel">10.07.2026 · 14:00 – 12.07.2025</div>
+        <div id="targetLabel" class="sub neon">10.07.2026 · 14:00</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Ziel: 10.07.2026, 14:00 (lokale Zeit des Browsers)
-    const targetDate = new Date(2026, 6, 10, 14, 0, 0); // Monat 0-basiert (6 = Juli)
-    const timerEl = document.getElementById("timer");
-    const labelEl = document.getElementById("targetLabel");
+    // Countdown Ziel: 10.07.2026, 14:00 (lokale Zeit)
+    const targetDate = new Date(2026, 6, 10, 14, 0, 0);
 
-    function pad(n) {
-      return String(n).padStart(2, "0");
-    }
+    const daysEl = document.getElementById("days");
+    const hmsEl = document.getElementById("hms");
+    const targetLabelEl = document.getElementById("targetLabel");
 
-    function updateTimer() {
+    function pad(n){ return String(n).padStart(2, "0"); }
+
+    function updateTimer(){
       const now = new Date();
-      let diff = targetDate - now;
+      const diff = targetDate - now;
 
       if (diff <= 0) {
-        timerEl.textContent = "0 TAGE 00:00:00";
-        labelEl.textContent = "JETZT.";
+        daysEl.textContent = "0 TAGE";
+        hmsEl.textContent = "00:00:00";
+        targetLabelEl.textContent = "JETZT.";
         return;
       }
 
@@ -204,11 +200,82 @@
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
 
-      timerEl.textContent = `${days} TAGE ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+      daysEl.textContent = `${days} TAGE`;
+      hmsEl.textContent = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
 
     updateTimer();
     setInterval(updateTimer, 250);
+
+    // --- Realistisches Flicker (unregelmäßige Pulse via JS) ---
+    const neonEls = [
+      document.getElementById("headline"),
+      document.getElementById("lineTop"),
+      document.getElementById("timer"),
+      document.getElementById("lineBottom"),
+      document.getElementById("targetLabel"),
+    ];
+
+    const states = ["flicker-dim", "flicker-pop", "flicker-off", "flicker-jitter"];
+    function clearStates(){
+      for (const el of neonEls) el.classList.remove(...states);
+    }
+
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+    function chance(p){ return Math.random() < p; }
+
+    // Ein "Event" besteht aus mehreren kurzen Impulsen (wie Zündversuche)
+    function runFlickerEvent(){
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      // Wie oft Events passieren: eher selten, damit es echt wirkt
+      // (Durchschnittlich alle ~2.5–6 Sekunden, plus Zufall)
+      const pulses = chance(0.25) ? 5 : chance(0.45) ? 3 : 2; // manchmal mehr Impulse
+
+      let i = 0;
+      (function pulse(){
+        i++;
+
+        // Art des Impulses bestimmen (meist dim, manchmal off, manchmal pop)
+        clearStates();
+
+        // “off” ist selten, aber sorgt für echten Neon-Vibe
+        if (chance(0.10)) {
+          for (const el of neonEls) el.classList.add("flicker-off");
+        } else if (chance(0.25)) {
+          for (const el of neonEls) el.classList.add("flicker-pop");
+        } else {
+          for (const el of neonEls) el.classList.add("flicker-dim");
+        }
+
+        // leichter mechanischer Jitter bei einem Teil der Impulse
+        if (chance(0.35)) {
+          for (const el of neonEls) el.classList.add("flicker-jitter");
+        }
+
+        // Impulsdauer sehr kurz (typisch 40–120ms)
+        const onDuration = rand(45, 120);
+
+        setTimeout(() => {
+          // zurück zum Normalzustand
+          clearStates();
+
+          // Wenn noch weitere Pulse in diesem Event folgen:
+          if (i < pulses) {
+            // kurze Pause zwischen Pulsen (30–140ms)
+            const gap = rand(30, 140);
+            setTimeout(pulse, gap);
+          } else {
+            // nächstes Event in unregelmäßigem Abstand
+            const nextIn = rand(1800, 5200) + (chance(0.20) ? rand(0, 2500) : 0);
+            setTimeout(runFlickerEvent, nextIn);
+          }
+        }, onDuration);
+      })();
+    }
+
+    // Start nach kurzer Verzögerung, damit Fonts erst laden können
+    setTimeout(runFlickerEvent, 900);
   </script>
 </body>
 </html>
